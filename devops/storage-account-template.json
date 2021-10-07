@@ -86,6 +86,72 @@
         },
         "shareSoftDeleteRetentionDays": {
             "type": "int"
+        },
+        "isHttpAllowed": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Whether the HTTP traffic is allowed."
+            }
+        },
+        "isHttpsAllowed": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Whether the HTTPS traffic is allowed."
+            }
+        },
+        "queryStringCachingBehavior": {
+            "type": "string",
+            "defaultValue": "IgnoreQueryString",
+            "allowedValues": [
+                "IgnoreQueryString",
+                "BypassCaching",
+                "UseQueryString"
+            ],
+            "metadata": {
+                "description": "Query string caching behavior."
+            }
+        },
+        "contentTypesToCompress": {
+            "type": "array",
+            "defaultValue": [
+                "text/plain",
+                "text/html",
+                "text/css",
+                "application/x-javascript",
+                "text/javascript"
+            ],
+            "metadata": {
+                "description": "Content type that is compressed."
+            }
+        },
+        "isCompressionEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Whether the compression is enabled"
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard_Microsoft",
+            "allowedValues": [
+                "Standard_Verizon",
+                "Standard_Akamai",
+                "Standard_Microsoft",
+                "Premium_Verizon"
+            ],
+            "metadata": {
+                "description": "Pricing tier of the CDN Profile."
+            }
+        },
+        "profileName": {
+            "type": "string",
+            "defaultValue": "dummyCdnProfile007",
+            "metadata": {
+                "description": "Name of the CDN Profile."
+            }
         }
     },
     "variables": {},
@@ -159,6 +225,62 @@
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
                 "[concat(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '/blobServices/default')]"
             ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2021-04-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/$web')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "name": "[parameters('profileName')]",
+            "type": "Microsoft.Cdn/profiles",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-04-15",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "tags": {
+                "CreatedBy": "[parameters('createdBy')]"
+            },
+            "properties": {}
+        },
+        {
+            "apiVersion": "2020-04-15",
+            "name": "[concat(parameters('profileName'),'/',parameters('endpointName'))]",
+            "type": "Microsoft.Cdn/profiles/endpoints",
+            "location": "[parameters('location')]",
+            "tags": {
+                "CreatedBy": "[parameters('createdBy')]"
+            },
+            "dependsOn": [
+                "[parameters('profileName')]",
+                "[parameters('storageAccountName')]"
+            ],
+            "properties": {
+                "originHostHeader": "[replace(replace(reference(parameters('storageAccountName')).primaryEndpoints.blob,'https://',''),'/','')]",
+                "isHttpAllowed": "[parameters('isHttpAllowed')]",
+                "isHttpsAllowed": "[parameters('isHttpsAllowed')]",
+                "queryStringCachingBehavior": "[parameters('queryStringCachingBehavior')]",
+                "contentTypesToCompress": "[parameters('contentTypesToCompress')]",
+                "isCompressionEnabled": "[parameters('isCompressionEnabled')]",
+                "origins": [
+                    {
+                        "name": "origin1",
+                        "properties": {
+                            "hostName": "[replace(replace(reference(parameters('storageAccountName')).primaryEndpoints.blob,'https://',''),'/','')]"
+                        }
+                    }
+                ]
+            }
         }
     ],
     "outputs": {}

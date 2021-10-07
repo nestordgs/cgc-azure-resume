@@ -1,4 +1,8 @@
 ## Deploy Create
+
+resourceGroup="1-8c3a13d6-playground-sandbox"
+deploymentName="stge-acg-resume"
+
 command to deploy and create template for **Storage Account**
 
 ```bash
