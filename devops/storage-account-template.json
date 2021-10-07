@@ -152,6 +152,12 @@
             "metadata": {
                 "description": "Name of the CDN Profile."
             }
+        },
+        "endpointName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the CDN Endpoint"
+            }
         }
     },
     "variables": {},
@@ -172,12 +178,27 @@
                 "networkAcls": {
                     "bypass": "[parameters('networkAclsBypass')]",
                     "defaultAction": "[parameters('networkAclsDefaultAction')]",
-                    "ipRules": []
+                    "ipRules": [],
+                    "virtualNetworkRules": []
+                },
+                "encryption": {
+                    "keySource":"Microsoft.Storage",
+                    "services":{
+                        "file":{
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob":{
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    }
                 }
             },
             "dependsOn": [],
             "sku": {
-                "name": "[parameters('accountType')]"
+                "name": "[parameters('accountType')]",
+                "tier": "Standard"
             },
             "kind": "[parameters('kind')]",
             "tags": {
@@ -202,10 +223,17 @@
                     "enabled": "[parameters('isContainerSoftDeleteEnabled')]",
                     "days": "[parameters('containerSoftDeleteRetentionDays')]"
                 },
+                "cors": {
+                    "corsRules": []
+                },
                 "changeFeed": {
                     "enabled": "[parameters('changeFeed')]"
                 },
                 "isVersioningEnabled": "[parameters('isVersioningEnabled')]"
+            },
+            "sku": {
+                "name": "[parameters('accountType')]",
+                "tier": "Standard"
             },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
@@ -274,7 +302,7 @@
                 "isCompressionEnabled": "[parameters('isCompressionEnabled')]",
                 "origins": [
                     {
-                        "name": "origin1",
+                        "name": "resumewebsite",
                         "properties": {
                             "hostName": "[replace(replace(reference(parameters('storageAccountName')).primaryEndpoints.blob,'https://',''),'/','')]"
                         }
