@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "acg-resume-counter-db"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "locationName": {
+            "value": "East US"
+        },
+        "defaultExperience": {
+            "value": "Core (SQL)"
+        },
+        "isZoneRedundant": {
+            "value": "false"
+        },
+        "pairedLocation": {
+            "value": "eastus"
+        },
+        "pairedLocationName": {
+            "value": "East US"
+        },
+        "project": {
+            "value": "acg-resume-az"
+        },
+        "createdBy": {
+            "value": "nestordgs"
+        },
+        "environment": {
+            "value": "dev"
+        }
+    }
+}
