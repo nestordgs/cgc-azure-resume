@@ -76,6 +76,12 @@
         },
         "environment": {
             "value": "dev"
+        },
+        "profileName": {
+            "value": "cdn-profile-acg-resume-az"
+        },
+        "endpointName": {
+            "value": "acg-resume-az-nestordgs"
         }
     }
 }

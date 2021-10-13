@@ -155,6 +155,7 @@
         },
         "endpointName": {
             "type": "string",
+            "defaultValue": "testing-cdn-name",
             "metadata": {
                 "description": "Name of the CDN Endpoint"
             }
