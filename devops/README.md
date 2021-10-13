@@ -12,6 +12,7 @@ Steps
 
 - Desploy Storage Account With Container & CDN
 - Enable manually the "Static Website" for Storage Account
+- Purge endpoint in path `/`
 
 command to deploy and create template for **Storage Account**
 

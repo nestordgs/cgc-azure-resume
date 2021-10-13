@@ -257,7 +257,9 @@
                 "name": "[parameters('sku')]"
             },
             "tags": {
-                "CreatedBy": "[parameters('createdBy')]"
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
             },
             "properties": {}
         },
@@ -267,7 +269,9 @@
             "type": "Microsoft.Cdn/profiles/endpoints",
             "location": "[parameters('location')]",
             "tags": {
-                "CreatedBy": "[parameters('createdBy')]"
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
             },
             "dependsOn": [
                 "[parameters('profileName')]",
