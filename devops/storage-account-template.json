@@ -180,25 +180,11 @@
                     "defaultAction": "[parameters('networkAclsDefaultAction')]",
                     "ipRules": [],
                     "virtualNetworkRules": []
-                },
-                "encryption": {
-                    "keySource":"Microsoft.Storage",
-                    "services":{
-                        "file":{
-                            "keyType": "Account",
-                            "enabled": true
-                        },
-                        "blob":{
-                            "keyType": "Account",
-                            "enabled": true
-                        }
-                    }
                 }
             },
             "dependsOn": [],
             "sku": {
-                "name": "[parameters('accountType')]",
-                "tier": "Standard"
+                "name": "[parameters('accountType')]"
             },
             "kind": "[parameters('kind')]",
             "tags": {
@@ -223,17 +209,10 @@
                     "enabled": "[parameters('isContainerSoftDeleteEnabled')]",
                     "days": "[parameters('containerSoftDeleteRetentionDays')]"
                 },
-                "cors": {
-                    "corsRules": []
-                },
                 "changeFeed": {
                     "enabled": "[parameters('changeFeed')]"
                 },
                 "isVersioningEnabled": "[parameters('isVersioningEnabled')]"
-            },
-            "sku": {
-                "name": "[parameters('accountType')]",
-                "tier": "Standard"
             },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
@@ -294,7 +273,7 @@
                 "[parameters('storageAccountName')]"
             ],
             "properties": {
-                "originHostHeader": "[replace(replace(reference(parameters('storageAccountName')).primaryEndpoints.blob,'https://',''),'/','')]",
+                "originHostHeader": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
                 "isHttpAllowed": "[parameters('isHttpAllowed')]",
                 "isHttpsAllowed": "[parameters('isHttpsAllowed')]",
                 "queryStringCachingBehavior": "[parameters('queryStringCachingBehavior')]",
@@ -304,7 +283,13 @@
                     {
                         "name": "resumewebsite",
                         "properties": {
-                            "hostName": "[replace(replace(reference(parameters('storageAccountName')).primaryEndpoints.blob,'https://',''),'/','')]"
+                            "hostName": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
+                            "httpPort": 80,
+                            "httpsPort": 443,
+                            "originHostHeader": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
+                            "priority": 1,
+                            "weight": 1000,
+                            "enabled": true
                         }
                     }
                 ]
