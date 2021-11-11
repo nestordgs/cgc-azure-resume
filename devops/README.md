@@ -5,7 +5,7 @@
 ```bash
 export resourceGroup="1-9f6200b2-playground-sandbox"
 export deploymentName="stge-acg-resume"
-export accountName="acgresumeaztesting"
+export accountName="stgeaccount"
 ```
 
 Steps
@@ -17,7 +17,7 @@ Steps
 command to deploy and create template for **Storage Account**
 
 ```bash
-az deployment group create -g $resourceGroup -n $deploymentName \
+az deployment group create -g $resourceGroup -n 'acg-resume-stge-account' \
     --template-file devops/storage-account-template.json \
     --parameters devops/storage-account-parameters.json
 ```
@@ -27,7 +27,7 @@ az deployment group create -g $resourceGroup -n $deploymentName \
 command to deploy and update template for **Storage Account**
 
 ```bash
-az deployment group create -g $resourceGroup -n $deploymentName \
+az deployment group create -g $resourceGroup -n 'acg-resume-stge-account' \
     --template-file devops/storage-account-template.json \
     --parameters devops/storage-account-parameters.json \
     --mode Complete

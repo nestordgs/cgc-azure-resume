@@ -161,10 +161,15 @@
             }
         }
     },
-    "variables": {},
+    "variables": {
+        "appInsightsName" :"[concat('appi-',parameters('project'),parameters('environment'),resourceGroup().location)]",
+        "storageAccountsName" :"[parameters('storageAccountName')]",
+        "appServicePlanName" :"[concat('plan-',parameters('project'),parameters('environment'),resourceGroup().location)]",
+        "sitesFunctionAppName" :"[concat('sites-func-',parameters('project'),parameters('environment'),resourceGroup().location)]"
+    },
     "resources": [
         {
-            "name": "[parameters('storageAccountName')]",
+            "name": "[variables('storageAccountsName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-06-01",
             "location": "[parameters('location')]",

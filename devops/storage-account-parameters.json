@@ -6,7 +6,7 @@
             "value": "eastus"
         },
         "storageAccountName": {
-            "value": "acgresumeaztesting"
+            "value": "stgeaccount"
         },
         "accountType": {
             "value": "Standard_RAGRS"
