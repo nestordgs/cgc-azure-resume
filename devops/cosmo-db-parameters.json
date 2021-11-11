@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "name": {
+        "dbName": {
             "value": "acg-resume-counter-db"
         },
         "location": {
@@ -18,7 +18,7 @@
             "value": "false"
         },
         "pairedLocation": {
-            "value": "eastus"
+            "value": "West US"
         },
         "pairedLocationName": {
             "value": "East US"
