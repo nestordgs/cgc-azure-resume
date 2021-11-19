@@ -38,3 +38,12 @@ Command to upload static fields to blob container
 ```bash
     az storage blob upload-batch --account-name $accountName -d '$web' -s frontend/
 ```
+
+Command to deploy and create the **Cosmo DB**
+
+```bash
+az deployment group create -g $resourceGroup -n 'acg-resume-cosmo-db-n' \
+    --template-file devops/cosmo-db-template.json \
+    --parameters devops/cosmo-db-parameters.json \
+    --mode Complete
+```
