@@ -1,70 +1,86 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environment": {
-            "type": "string",
-            "defaultValue": "dev",
-            "metadata": {
-                "description": "Environment name where will be deployed the template"
-            }
+        "createMode": {
+            "type": "securestring"
         },
-        "project": {
-            "type": "string",
-            "metadata": {
-                "description": "Project name"
-            }
-        },
-        "createdBy": {
-            "type": "string",
-            "metadata": {
-                "description": "Person who deploy the template"
-            }
-        },
-        "name": {
+        "dbName": {
+            "defaultValue": "acg-resume-counter-db",
             "type": "string"
         },
-        "location": {
+        "containerName": {
+            "defaultValue": "acg-resume-counter-container",
+            "type": "string"
+        },
+        "defaultExperience": {
+            "defaultValue": "Core (SQL)",
             "type": "string"
         },
         "locationName": {
             "type": "string"
         },
-        "defaultExperience": {
+        "environment": {
+            "defaultValue": "dev",
             "type": "string"
         },
-        "isZoneRedundant": {
+        "project": {
             "type": "string"
         },
-        "pairedLocation": {
-            "type": "string"
-        },
-        "pairedLocationName": {
+        "createdBy": {
             "type": "string"
         }
     },
     "variables": {},
     "resources": [
         {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2021-07-01-preview",
+            "name": "[parameters('dbName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "defaultExperience": "[parameters('defaultExperience')]",
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]",
+                "hidden-cosmos-mmspecial": ""
+            },
             "kind": "GlobalDocumentDB",
-            "type": "Microsoft.DocumentDb/databaseAccounts",
-            "name": "[parameters('name')]",
-            "location": "[parameters('location')]",
+            "identity": {
+                "type": "None"
+            },
             "properties": {
+                "publicNetworkAccess": "Enabled",
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "disableKeyBasedMetadataWriteAccess": false,
+                "enableFreeTier": true,
+                "enableAnalyticalStorage": false,
+                "analyticalStorageConfiguration": {
+                    "schemaType": "WellDefined"
+                },
                 "databaseAccountOfferType": "Standard",
+                "defaultIdentity": "FirstPartyIdentity",
+                "networkAclBypass": "None",
+                "disableLocalAuth": false,
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
                 "locations": [
                     {
-                        "id": "[concat(parameters('name'), '-', parameters('location'))]",
+                        "locationName": "[resourceGroup().location]",
+                        "provisioningState": "Succeeded",
                         "failoverPriority": 0,
-                        "locationName": "[parameters('locationName')]"
-                    },
-                    {
-                        "id": "[concat(parameters('name'), '-', parameters('pairedLocation'))]",
-                        "failoverPriority": 1,
-                        "locationName": "[parameters('pairedLocationName')]"
+                        "isZoneRedundant": false
                     }
                 ],
+                "cors": [],
+                "capabilities": [],
+                "ipRules": [],
                 "backupPolicy": {
                     "type": "Periodic",
                     "periodicModeProperties": {
@@ -73,19 +89,135 @@
                         "backupStorageRedundancy": "Geo"
                     }
                 },
-                "isVirtualNetworkFilterEnabled": false,
-                "virtualNetworkRules": [],
-                "ipRules": [],
-                "dependsOn": [],
-                "enableMultipleWriteLocations": true,
-                "capabilities": [],
-                "enableFreeTier": true
-            },
-            "tags": {
-                "defaultExperience": "[parameters('defaultExperience')]",
-                "hidden-cosmos-mmspecial": ""
+                "networkAclBypassResourceIds": [],
+                "diagnosticLogSettings": {
+                    "enableFullTextQuery": "None"
+                },
+                "createMode": "[parameters('createMode')]"
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2021-07-01-preview",
+            "name": "[concat(parameters('dbName'), '/', parameters('dbName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[parameters('dbName')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-07-01-preview",
+            "name": "[concat(parameters('dbName'), '/00000000-0000-0000-0000-000000000001')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Reader",
+                "type": 0,
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/readChangeFeed",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-07-01-preview",
+            "name": "[concat(parameters('dbName'), '/00000000-0000-0000-0000-000000000002')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Contributor",
+                "type": 0,
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-07-01-preview",
+            "name": "[concat(parameters('dbName'), '/', parameters('dbName'), '/', parameters('containerName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('dbName'), parameters('dbName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[parameters('containerName')]",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/page"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
+            "apiVersion": "2021-07-01-preview",
+            "name": "[concat(parameters('dbName'), '/', parameters('dbName'), '/', parameters('containerName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('dbName'), parameters('dbName'), parameters('containerName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('dbName'), parameters('dbName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400,
+                    "autoscaleSettings": {
+                        "maxThroughput": 4000
+                    }
+                }
             }
         }
-    ],
-    "outputs": {}
+    ]
 }

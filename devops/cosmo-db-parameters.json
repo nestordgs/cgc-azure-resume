@@ -3,25 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "dbName": {
-            "value": "acg-resume-counter-db"
+            "value": "acg-resume-counter-db-n"
         },
-        "location": {
-            "value": "eastus"
+        "containerName": {
+            "value": "acg-resume-counter-container"
         },
         "locationName": {
-            "value": "East US"
+            "value": "Central US"
         },
         "defaultExperience": {
             "value": "Core (SQL)"
-        },
-        "isZoneRedundant": {
-            "value": "false"
-        },
-        "pairedLocation": {
-            "value": "West US"
-        },
-        "pairedLocationName": {
-            "value": "East US"
         },
         "project": {
             "value": "acg-resume-az"
@@ -31,6 +22,9 @@
         },
         "environment": {
             "value": "dev"
+        },
+        "createMode": {
+            "value": "Default"
         }
     }
 }
