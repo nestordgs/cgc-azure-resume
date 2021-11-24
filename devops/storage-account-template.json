@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "environment": {
@@ -21,9 +21,6 @@
                 "description": "Person who deploy the template"
             }
         },
-        "location": {
-            "type": "string"
-        },
         "storageAccountName": {
             "type": "string"
         },
@@ -34,6 +31,7 @@
             "type": "string"
         },
         "accessTier": {
+            "defaultValue": "Hot",
             "type": "string"
         },
         "minimumTlsVersion": {
@@ -114,13 +112,12 @@
             }
         },
         "contentTypesToCompress": {
-            "type": "array",
+            "type": "Array",
             "defaultValue": [
-                "text/plain",
-                "text/html",
-                "text/css",
-                "application/x-javascript",
-                "text/javascript"
+                    "text/javascript",
+                    "text/plain",
+                    "text/html",
+                    "text/css"
             ],
             "metadata": {
                 "description": "Content type that is compressed."
@@ -162,17 +159,14 @@
         }
     },
     "variables": {
-        "appInsightsName" :"[concat('appi-',parameters('project'),parameters('environment'),resourceGroup().location)]",
-        "storageAccountsName" :"[parameters('storageAccountName')]",
-        "appServicePlanName" :"[concat('plan-',parameters('project'),parameters('environment'),resourceGroup().location)]",
-        "sitesFunctionAppName" :"[concat('sites-func-',parameters('project'),parameters('environment'),resourceGroup().location)]"
+        "storageAccountsName" :"[parameters('storageAccountName')]"
     },
     "resources": [
         {
             "name": "[variables('storageAccountsName')]",
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2021-06-01",
-            "location": "[parameters('location')]",
+            "apiVersion": "2021-04-01",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "accessTier": "[parameters('accessTier')]",
                 "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
@@ -186,11 +180,25 @@
                     "defaultAction": "[parameters('networkAclsDefaultAction')]",
                     "ipRules": [],
                     "virtualNetworkRules": []
+                },
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
                 }
             },
             "dependsOn": [],
             "sku": {
-                "name": "[parameters('accountType')]"
+                "name": "[parameters('accountType')]",
+                "tier": "Standard"
             },
             "kind": "[parameters('kind')]",
             "tags": {
@@ -202,7 +210,7 @@
         {
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2021-06-01",
+            "apiVersion": "2019-06-01",
             "properties": {
                 "restorePolicy": {
                     "enabled": "[parameters('isContainerRestoreEnabled')]"
@@ -225,23 +233,34 @@
             ]
         },
         {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
-            "type": "Microsoft.Storage/storageAccounts/fileservices",
-            "apiVersion": "2021-06-01",
-            "properties": {
-                "shareDeleteRetentionPolicy": {
-                    "enabled": "[parameters('isShareSoftDeleteEnabled')]",
-                    "days": "[parameters('shareSoftDeleteRetentionDays')]"
-                }
-            },
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-                "[concat(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '/blobServices/default')]"
-            ]
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2021-04-01",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default/$web')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
@@ -254,10 +273,61 @@
             }
         },
         {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/scm-releases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
             "name": "[parameters('profileName')]",
             "type": "Microsoft.Cdn/profiles",
-            "location": "[parameters('location')]",
-            "apiVersion": "2020-04-15",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2016-04-02",
             "sku": {
                 "name": "[parameters('sku')]"
             },
@@ -272,7 +342,7 @@
             "apiVersion": "2020-04-15",
             "name": "[concat(parameters('profileName'),'/',parameters('endpointName'))]",
             "type": "Microsoft.Cdn/profiles/endpoints",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "tags": {
                 "Environment": "[parameters('environment')]",
                 "Created By": "[parameters('createdBy')]",
