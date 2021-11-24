@@ -79,12 +79,6 @@
         "isVersioningEnabled": {
             "type": "bool"
         },
-        "isShareSoftDeleteEnabled": {
-            "type": "bool"
-        },
-        "shareSoftDeleteRetentionDays": {
-            "type": "int"
-        },
         "isHttpAllowed": {
             "type": "bool",
             "defaultValue": true,

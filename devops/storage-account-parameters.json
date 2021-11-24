@@ -56,12 +56,6 @@
         "isVersioningEnabled": {
             "value": false
         },
-        "isShareSoftDeleteEnabled": {
-            "value": true
-        },
-        "shareSoftDeleteRetentionDays": {
-            "value": 7
-        },
         "project": {
             "value": "acg-resume-az"
         },
