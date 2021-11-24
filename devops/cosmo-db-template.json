@@ -17,9 +17,6 @@
             "defaultValue": "Core (SQL)",
             "type": "string"
         },
-        "locationName": {
-            "type": "string"
-        },
         "environment": {
             "defaultValue": "dev",
             "type": "string"
