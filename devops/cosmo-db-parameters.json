@@ -8,9 +8,6 @@
         "containerName": {
             "value": "acg-resume-counter-container"
         },
-        "locationName": {
-            "value": "Central US"
-        },
         "defaultExperience": {
             "value": "Core (SQL)"
         },
