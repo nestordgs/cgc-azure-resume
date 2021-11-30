@@ -34,7 +34,8 @@
     },
     "variables": {
         "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
-        "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]"
+        "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
+        "stoge_acc_deployment": "acg-resume-stge-account" // TODO: Make this a concat value
     },
     "resources": [
         {
@@ -75,7 +76,7 @@
             "location": "[ resourceGroup().location ]",
             "kind": "functionapp,linux",
             "dependsOn": [
-                "[ resourceId('Microsoft.Web/serverfarms', variables('service_plan_name')) ]"
+                "[ resourceId('Microsoft.Web/serverfarms', variables('service_plan_name') ) ]" // TODO: Add dependenci of storage account
             ],
             "properties": {
                 "enabled": true,
@@ -102,7 +103,21 @@
                     "alwaysOn": false,
                     "http20Enabled": false,
                     "functionAppScaleLimit": 200,
-                    "minimumElasticInstanceCount": 0
+                    "minimumElasticInstanceCount": 0,
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('stoge_acc_deployment')), '2021-04-01' ).outputs.azureWebJobsStorage.value ]"
+                        }
+                    ]
                 },
                 "scmSiteAlsoStopped": false,
                 "clientAffinityEnabled": false,
