@@ -153,7 +153,7 @@
         }
     },
     "variables": {
-        "storageAccountsName" :"[parameters('storageAccountName')]"
+        "storageAccountsName" :"[ replace( concat( parameters('project'), parameters('environment'), parameters('storageAccountName') ), '-', '') ]"
     },
     "resources": [
         {
@@ -202,7 +202,7 @@
             }
         },
         {
-            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "name": "[concat(variables('storageAccountsName'), '/default')]",
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
             "properties": {
@@ -223,15 +223,15 @@
                 "isVersioningEnabled": "[parameters('isVersioningEnabled')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountsName'))]"
             ]
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "name": "[concat(variables('storageAccountsName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
             ],
             "properties": {
                 "cors": {
@@ -242,9 +242,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "name": "[concat(variables('storageAccountsName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
             ],
             "properties": {
                 "cors": {
@@ -255,10 +255,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default/$web')]",
+            "name": "[concat(variables('storageAccountsName'), '/default/$web')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountsName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
             ],
             "properties": {
                 "defaultEncryptionScope": "$account-encryption-key",
@@ -269,27 +269,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-hosts')]",
+            "name": "[concat(variables('storageAccountsName'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-            ],
-            "properties": {
-                "immutableStorageWithVersioning": {
-                    "enabled": false
-                },
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-secrets')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountsName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
             ],
             "properties": {
                 "immutableStorageWithVersioning": {
@@ -303,10 +286,27 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccountName'), '/default/scm-releases')]",
+            "name": "[concat(variables('storageAccountsName'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountsName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountsName'), '/default/scm-releases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountsName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName'))]"
             ],
             "properties": {
                 "immutableStorageWithVersioning": {
@@ -344,10 +344,10 @@
             },
             "dependsOn": [
                 "[parameters('profileName')]",
-                "[parameters('storageAccountName')]"
+                "[variables('storageAccountsName')]"
             ],
             "properties": {
-                "originHostHeader": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
+                "originHostHeader": "[concat(variables('storageAccountsName'),'.z13.web.core.windows.net')]",
                 "isHttpAllowed": "[parameters('isHttpAllowed')]",
                 "isHttpsAllowed": "[parameters('isHttpsAllowed')]",
                 "queryStringCachingBehavior": "[parameters('queryStringCachingBehavior')]",
@@ -357,10 +357,10 @@
                     {
                         "name": "resumewebsite",
                         "properties": {
-                            "hostName": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
+                            "hostName": "[concat(variables('storageAccountsName'),'.z13.web.core.windows.net')]",
                             "httpPort": 80,
                             "httpsPort": 443,
-                            "originHostHeader": "[concat(parameters('storageAccountName'),'.z13.web.core.windows.net')]",
+                            "originHostHeader": "[concat(variables('storageAccountsName'),'.z13.web.core.windows.net')]",
                             "priority": 1,
                             "weight": 1000,
                             "enabled": true
@@ -373,7 +373,7 @@
     "outputs": {
         "AzureWebJobsStorage": {
             "type": "string",
-            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys( resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName') ), '2021-04-01' ).keys[0].value, ';EndpointSuffix=core.windows.net' ) ]"
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountsName'), ';AccountKey=', listKeys( resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName') ), '2021-04-01' ).keys[0].value, ';EndpointSuffix=core.windows.net' ) ]"
         }
     }
 }

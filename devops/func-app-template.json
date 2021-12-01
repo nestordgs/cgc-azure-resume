@@ -35,7 +35,7 @@
     "variables": {
         "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
         "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
-        "stoge_acc_deployment": "acg-resume-stge-account" // TODO: Make this a concat value
+        "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]"
     },
     "resources": [
         {
