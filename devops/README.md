@@ -3,8 +3,8 @@
 ## Deploy Create
 
 ```bash
-export resourceGroup="1-9f6200b2-playground-sandbox"
-export deploymentName="stge-acg-resume"
+export resourceGroup="1-886aaeb8-playground-sandbox"
+export deploymentName="acg-resume-cosmo-db"
 export accountName="stgeaccount"
 ```
 
@@ -19,20 +19,9 @@ Steps
 command to deploy and create template for **Storage Account**
 
 ```bash
-az deployment group create -g $resourceGroup -n 'acg-resume-stge-account' \
+az deployment group create -g $resourceGroup -n 'acg-resume-az-stge-account-deployment' \
     --template-file devops/storage-account-template.json \
     --parameters devops/storage-account-parameters.json
-```
-
-## Deploy Update
-
-command to deploy and update template for **Storage Account**
-
-```bash
-az deployment group create -g $resourceGroup -n 'acg-resume-az-stge-account' \
-    --template-file devops/storage-account-template.json \
-    --parameters devops/storage-account-parameters.json \
-    --mode Complete
 ```
 
 Command to upload static fields to blob container
@@ -44,17 +33,15 @@ Command to upload static fields to blob container
 Command to deploy and create the **Cosmo DB**
 
 ```bash
-az deployment group create -g $resourceGroup -n 'acg-resume-az-cosmo-db' \
+az deployment group create -g $resourceGroup -n 'acg-resume-az-cosmo-db-deployment' \
     --template-file devops/cosmo-db-template.json \
-    --parameters devops/cosmo-db-parameters.json \
-    --mode Complete
+    --parameters devops/cosmo-db-parameters.json
 ```
 
 Command to deploy and create the **Azure Function**
 
 ```bash
-az deployment group create -g $resourceGroup -n 'acg-resume-az-function-app' \
+az deployment group create -g $resourceGroup -n 'acg-resume-az-function-app-deployment' \
     --template-file devops/func-app-template.json \
-    --parameters devops/func-app-parameters.json \
-    --mode Complete
+    --parameters devops/func-app-parameters.json
 ```

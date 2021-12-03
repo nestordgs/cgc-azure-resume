@@ -35,7 +35,8 @@
     "variables": {
         "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
         "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
-        "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]"
+        "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]",
+        "app_insights_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name'), 'insights' ) ]"
     },
     "resources": [
         {
@@ -116,6 +117,18 @@
                         {
                             "name": "AzureWebJobsStorage",
                             "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('stoge_acc_deployment')), '2021-04-01' ).outputs.azureWebJobsStorage.value ]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('stoge_acc_deployment')), '2021-04-01' ).outputs.azureWebJobsStorage.value ]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('app_insights_name')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[ toLower( variables('function_app_name') ) ]"
                         }
                     ]
                 },
@@ -273,6 +286,20 @@
                 "Environment": "[parameters('environment')]",
                 "Created By": "[parameters('createdBy')]",
                 "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02",
+            "name": "[variables('app_insights_name')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "web",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('function_app_name'))]": "Resource"
+            },
+            "properties": {
+                "Application_Type": "web",
+                "ApplicationId": "[variables('app_insights_name')]"
             }
         }
     ],
