@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "dbName": {
-            "value": "acg-resume-counter-db-n"
+            "value": "counter"
         },
         "containerName": {
-            "value": "acg-resume-counter-container"
+            "value": "counter"
         },
         "defaultExperience": {
             "value": "Core (SQL)"

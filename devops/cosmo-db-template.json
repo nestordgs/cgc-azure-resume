@@ -6,7 +6,7 @@
             "type": "securestring"
         },
         "dbName": {
-            "defaultValue": "acg-resume-counter-db",
+            "defaultValue": "counter-db",
             "type": "string"
         },
         "containerName": {
@@ -28,12 +28,15 @@
             "type": "string"
         }
     },
-    "variables": {},
+    "variables": {
+        "dbName": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('dbName'), '-db' ) ]",
+        "containerName": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('containerName'), '-container' ) ]"
+    },
     "resources": [
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2021-07-01-preview",
-            "name": "[parameters('dbName')]",
+            "name": "[variables('dbName')]",
             "location": "[resourceGroup().location]",
             "tags": {
                 "defaultExperience": "[parameters('defaultExperience')]",
@@ -53,7 +56,7 @@
                 "isVirtualNetworkFilterEnabled": false,
                 "virtualNetworkRules": [],
                 "disableKeyBasedMetadataWriteAccess": false,
-                "enableFreeTier": true,
+                "enableFreeTier": false,
                 "enableAnalyticalStorage": false,
                 "analyticalStorageConfiguration": {
                     "schemaType": "WellDefined"
@@ -96,28 +99,28 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
             "apiVersion": "2021-07-01-preview",
-            "name": "[concat(parameters('dbName'), '/', parameters('dbName'))]",
+            "name": "[concat(variables('dbName'), '/', variables('dbName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
             ],
             "properties": {
                 "resource": {
-                    "id": "[parameters('dbName')]"
+                    "id": "[variables('dbName')]"
                 }
             }
         },
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
             "apiVersion": "2021-07-01-preview",
-            "name": "[concat(parameters('dbName'), '/00000000-0000-0000-0000-000000000001')]",
+            "name": "[concat(variables('dbName'), '/00000000-0000-0000-0000-000000000001')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Reader",
                 "type": 0,
                 "assignableScopes": [
-                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
                 ],
                 "permissions": [
                     {
@@ -135,15 +138,15 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
             "apiVersion": "2021-07-01-preview",
-            "name": "[concat(parameters('dbName'), '/00000000-0000-0000-0000-000000000002')]",
+            "name": "[concat(variables('dbName'), '/00000000-0000-0000-0000-000000000002')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Contributor",
                 "type": 0,
                 "assignableScopes": [
-                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
                 ],
                 "permissions": [
                     {
@@ -160,14 +163,14 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
             "apiVersion": "2021-07-01-preview",
-            "name": "[concat(parameters('dbName'), '/', parameters('dbName'), '/', parameters('containerName'))]",
+            "name": "[concat(variables('dbName'), '/', variables('dbName'), '/', variables('containerName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('dbName'), parameters('dbName'))]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('dbName'), variables('dbName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
             ],
             "properties": {
                 "resource": {
-                    "id": "[parameters('containerName')]",
+                    "id": "[variables('containerName')]",
                     "indexingPolicy": {
                         "indexingMode": "consistent",
                         "automatic": true,
@@ -201,11 +204,11 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/throughputSettings",
             "apiVersion": "2021-07-01-preview",
-            "name": "[concat(parameters('dbName'), '/', parameters('dbName'), '/', parameters('containerName'), '/default')]",
+            "name": "[concat(variables('dbName'), '/', variables('dbName'), '/', variables('containerName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('dbName'), parameters('dbName'), parameters('containerName'))]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('dbName'), parameters('dbName'))]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('dbName'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', variables('dbName'), variables('dbName'), variables('containerName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('dbName'), variables('dbName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
             ],
             "properties": {
                 "resource": {

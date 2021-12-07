@@ -5,7 +5,8 @@
 ```bash
 export resourceGroup="1-886aaeb8-playground-sandbox"
 export deploymentName="acg-resume-cosmo-db"
-export accountName="stgeaccount"
+export accountName="acgresumeazdevstge"
+export azureFunctionApp="acg-resume-az-dev-counter"
 ```
 
 Steps
@@ -44,4 +45,10 @@ Command to deploy and create the **Azure Function**
 az deployment group create -g $resourceGroup -n 'acg-resume-az-function-app-deployment' \
     --template-file devops/func-app-template.json \
     --parameters devops/func-app-parameters.json
+```
+
+Command to deploy *Azure Function* to *Function App*
+
+```bash
+    func azure functionapp publish $azureFunctionApp --python
 ```
