@@ -34,7 +34,7 @@ Command to upload static fields to blob container
 Command to deploy and create the **Cosmo DB**
 
 ```bash
-az deployment group create -g $resourceGroup -n 'acg-resume-az-cosmo-db-deployment' \
+az deployment group create -g $resourceGroup -n 'acg-resume-az-cosmos-db-deployment' \
     --template-file devops/cosmo-db-template.json \
     --parameters devops/cosmo-db-parameters.json
 ```
