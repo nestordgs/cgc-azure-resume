@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 import azure.functions as func
 from utils import send_response
@@ -13,7 +12,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     key_db = os.environ.get('KEY_DB')
 
     try:
-        page_parameter = req.params.get('page')
+        page_parameter = req.get_json().get('page')
 
         if page_parameter is None:
             return send_response({ "message":'Page Parameter is required', "code": 400 }, status_code=400)

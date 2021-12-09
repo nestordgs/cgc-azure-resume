@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 import azure.functions as func
 from utils import send_response
