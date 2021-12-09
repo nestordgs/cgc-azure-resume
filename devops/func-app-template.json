@@ -36,6 +36,7 @@
         "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
         "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
         "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]",
+        "cosmos_db_deployment": "[ concat( parameters('project'), '-cosmo-db', '-deployment' ) ]", // TO-DO: update cosmo to cosmos
         "app_insights_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name'), 'insights' ) ]"
     },
     "resources": [
@@ -129,6 +130,22 @@
                         {
                             "name": "WEBSITE_CONTENTSHARE",
                             "value": "[ toLower( variables('function_app_name') ) ]"
+                        },
+                        {
+                            "name": "CONNECTION_HOST",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.urlConnection.value ]"
+                        },
+                        {
+                            "name": "KEY_DB",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.primaryMasterKey.value ]"
+                        },
+                        {
+                            "name": "DATABASE_NAME",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.databaseName.value ]"
+                        },
+                        {
+                            "name": "CONTAINER_NAME",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.containerName.value ]"
                         }
                     ]
                 },

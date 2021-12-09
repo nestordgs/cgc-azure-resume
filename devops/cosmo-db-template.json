@@ -219,5 +219,23 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "primaryMasterKey": {
+            "type": "string"
+            , "value": "[ listKeys( resourceId( 'Microsoft.DocumentDB/databaseAccounts', variables('dbName') ), '2019-12-12' ).primaryMasterKey ]"
+        },
+        "urlConnection": {
+            "type": "string"
+            , "value": "[ concat( 'https://', variables('dbName'), '.documents.azure.com:443/' ) ]"
+        },
+        "databaseName": {
+            "type": "string"
+            , "value": "[ variables('dbName') ]"
+        },
+        "containerName": {
+            "type": "string"
+            , "value": "[ variables('containerName') ]"
+        }
+    }
 }
