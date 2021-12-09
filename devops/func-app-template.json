@@ -36,7 +36,7 @@
         "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
         "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
         "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]",
-        "cosmos_db_deployment": "[ concat( parameters('project'), '-cosmo-db', '-deployment' ) ]", // TO-DO: update cosmo to cosmos
+        "cosmos_db_deployment": "[ concat( parameters('project'), '-cosmos-db', '-deployment' ) ]",
         "app_insights_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name'), 'insights' ) ]"
     },
     "resources": [
