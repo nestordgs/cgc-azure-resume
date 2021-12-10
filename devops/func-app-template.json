@@ -252,6 +252,11 @@
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
                 "localMySqlEnabled": false,
+                "cors": {
+                    "allowedOrigins": [
+                        "*"
+                    ]
+                },
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "Any",
