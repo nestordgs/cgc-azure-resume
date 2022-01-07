@@ -2,7 +2,7 @@ name: IAC Deployment.
 on:
   pull_request:
     types: [labeled]
-    branches: [feature/github-actions]
+    branches: [develop]
 
 env:
   AZURE_RESOURCE_GROUP: cgc-azure-resume
@@ -12,7 +12,7 @@ jobs:
   setup-up-azure-resources:
     runs-on: ubuntu-latest
     
-    if: contains(github.event.pull_request.labels.*.name, 'Create')
+    if: contains(github.event.pull_request.labels.*.name, 'Create Infra')
     
     steps:
       - name: Checkout repository
@@ -61,7 +61,7 @@ jobs:
   destroy-azure-resources:
     runs-on: ubuntu-latest
     
-    if: contains(github.event.pull_request.labels.*.name, 'Destroy')
+    if: contains(github.event.pull_request.labels.*.name, 'Destroy Infra')
     
     steps:
       - name: Checkout repository
