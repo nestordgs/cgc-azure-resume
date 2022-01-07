@@ -23,6 +23,7 @@ jobs:
       - name: Create Azure Resource Group
         if: success()
         run: |
+          pwd
           az group create --location ${{ env.AZURE_LOCATION }} \
             --name ${{ env.AZURE_RESOURCE_GROUP }} \
             --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -31,6 +32,7 @@ jobs:
         if: success()
         working-directory: ./devops
         run: |
+          pwd
           az deployment group create -g ${{ env.AZURE_RESOURCE_GROUP }} -n 'acg-resume-az-stge-account-deployment' \
             --template-file storage-account-template.json \
             --parameters storage-account-parameters.json
