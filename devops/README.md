@@ -3,19 +3,19 @@
 ## Deploy Create
 
 ```bash
-export resourceGroup="1-886aaeb8-playground-sandbox"
-export deploymentName="acg-resume-cosmo-db"
-export accountName="acgresumeazdevstge"
-export azureFunctionApp="acg-resume-az-dev-counter"
+export resourceGroup="<your-resource-group-name>"
+export accountName="<your-storage-account-name>"
+export azureFunctionApp="<your-az-function-app>"
 ```
 
 Steps
 
 - Desploy Storage Account With Container & CDN
-- Enable manually the "Static Website" for Storage Account
-- Purge endpoint in path `/`
-- Deploy Cosmos DB template.
-- Deploy Function App template.
+- Deploy Cosmos DB.
+- Deploy Function App.
+- Enable manually the "Static Website" for Storage Account.
+- Purge endpoint in path `/`.
+- Deploy Azure Function to Azure Function App.
 
 command to deploy and create template for **Storage Account**
 
