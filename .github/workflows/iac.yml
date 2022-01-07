@@ -30,12 +30,10 @@ jobs:
         
       - name: Create Storage Account in Resource Group
         if: success()
-        working-directory: ./devops
         run: |
-          pwd
           az deployment group create -g ${{ env.AZURE_RESOURCE_GROUP }} -n 'acg-resume-az-stge-account-deployment' \
-            --template-file storage-account-template.json \
-            --parameters storage-account-parameters.json
+            --template-file ./devops/storage-account-template.json \
+            --parameters ./devops/storage-account-parameters.json
             
   destroy-azure-resources:
     runs-on: ubuntu-latest
