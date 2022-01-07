@@ -12,7 +12,7 @@ jobs:
   setup-up-azure-resources:
     runs-on: ubuntu-latest
     
-    if: containes(github.event.pull_request.labels.*.name, 'Create')
+    if: contains(github.event.pull_request.labels.*.name, 'Create')
     
     steps:
       - name: Azure login
@@ -37,7 +37,7 @@ jobs:
   destroy-azure-resources:
     runs-on: ubuntu-latest
     
-    if: containes(github.event.pull_request.labels.*.name, 'Destroy')
+    if: contains(github.event.pull_request.labels.*.name, 'Destroy')
     
     steps:
       - name: Azure Login
