@@ -6,7 +6,7 @@ on:
 
 env:
   AZURE_RESOURCE_GROUP: cgc-azure-resume
-  AZURE_LOCATION: '"Central US"'
+  AZURE_LOCATION: '"East US"'
 
 jobs:
   setup-up-azure-resources:
