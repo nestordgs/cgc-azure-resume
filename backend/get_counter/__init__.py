@@ -42,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         list_pages = list(response_query)
 
-        if len(list_pages) is 0:
+        if len(list_pages) == 0:
             return send_response(
                 { "message": 'There is ot any page with the id "{}"'.format(page_parameter) , "code": 404 }
                 , status_code=404
