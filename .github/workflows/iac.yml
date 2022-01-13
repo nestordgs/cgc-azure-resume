@@ -7,6 +7,7 @@ on:
 env:
   AZURE_RESOURCE_GROUP: cgc-azure-resume
   AZURE_LOCATION: '"Central US"'
+  AZURE_STORAGE_ACCOUNT_NAME: acgresumeazdevstge
 
 jobs:
   setup-up-azure-resources:
@@ -26,7 +27,6 @@ jobs:
       - name: Create Azure Resource Group
         if: success()
         run: |
-          pwd
           az group create --location ${{ env.AZURE_LOCATION }} \
             --name ${{ env.AZURE_RESOURCE_GROUP }} \
             --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -39,7 +39,24 @@ jobs:
           template: devops/storage-account-template.json
           parameters: devops/storage-account-parameters.json
           deploymentName: acg-resume-az-stge-account-deployment
-        
+      
+      - name: Enabled Static Website for Storage Account
+        if: success()
+        run: |
+          az storage blob service-properties update \
+            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --static-website \
+            --404-document index.html \
+            --index-document index.html
+
+      - name: Upload Frontend files to Storage account
+        if: success()
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
+            -d '$web' \
+            -s frontend/
+
       # - name: Create Cosmo DB
       #   uses: azure/arm-deploy@v1
       #   if: success()
