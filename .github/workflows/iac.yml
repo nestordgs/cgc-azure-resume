@@ -44,7 +44,7 @@ jobs:
         if: success()
         run: |
           az storage blob service-properties update \
-            --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
             --static-website \
             --404-document index.html \
             --index-document index.html
@@ -53,7 +53,7 @@ jobs:
         if: success()
         run: |
           az storage blob upload-batch \
-            --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
             -d '$web' \
             -s frontend/
 
