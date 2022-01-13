@@ -56,7 +56,7 @@
                 "isVirtualNetworkFilterEnabled": false,
                 "virtualNetworkRules": [],
                 "disableKeyBasedMetadataWriteAccess": false,
-                "enableFreeTier": false,
+                "enableFreeTier": true,
                 "enableAnalyticalStorage": false,
                 "analyticalStorageConfiguration": {
                     "schemaType": "WellDefined"
@@ -118,7 +118,7 @@
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Reader",
-                "type": 0,
+                "type": "BuiltInRole",
                 "assignableScopes": [
                     "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
                 ],
@@ -144,7 +144,7 @@
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Contributor",
-                "type": 0,
+                "type": "BuiltInRole",
                 "assignableScopes": [
                     "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('dbName'))]"
                 ],
@@ -214,7 +214,7 @@
                 "resource": {
                     "throughput": 400,
                     "autoscaleSettings": {
-                        "maxThroughput": 4000
+                        "maxThroughput": 2000
                     }
                 }
             }

@@ -34,7 +34,7 @@
 
 <body id="top">
   <header class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="header-nav" role="navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="header-nav" role="navigation" aria-labelledby="mainnavheading">
       <div class="container"><a class="link-dark navbar-brand site-title mb-0" href="#">nestordgs</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
@@ -63,19 +63,22 @@
                   <p class="lead fw-normal mt-3" data-aos="fade-up" data-aos-delay="100">Full Stack Developer</p>
                   <p class="text-secondary counter-message" data-aos="fade-up" data-aos-delay="100">This page has been viewed <span id="counter-value" class="counter-value">0</span> times 🤗</p>
                   <div class="social-nav" data-aos="fade-up" data-aos-delay="200">
-                    <nav role="navigation">
+                    <nav role="navigation-links" aria-labelledby="mainnavlinks">
                       <ul class="nav justify-content-left">
-                        <li class="nav-item"><a class="nav-link" target="_blank"
-                            href="https://www.linkedin.com/nestordgs" title="LinkedIn"><i
-                              class="fab fa-linkedin"></i><span class="menu-title sr-only">LinkedIn</span></a></li>
-                        <li class="nav-item"><a class="nav-link" target="_blank" href="https://github.com/nestordgs"
-                            title="GitHub"><i class="fab fa-github"></i><span
+                        <li class="nav-item">
+                          <a class="nav-link" target="_blank" rel="noopener" href="https://www.linkedin.com/in/nestordgs/" title="LinkedIn">
+                            <em class="fab fa-linkedin"></em>
+                            <span class="menu-title sr-only">LinkedIn</span>
+                          </a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener" href="https://github.com/nestordgs"
+                            title="GitHub"><em class="fab fa-github"></em><span
                               class="menu-title sr-only">GitHub</span></a></li>
-                        <li class="nav-item"><a class="nav-link" target="_blank" href="https://gitlab.com/nestordgs"
-                            title="Gitlab"><i class="fab fa-gitlab"></i><span
+                        <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener" href="https://gitlab.com/nestordgs"
+                            title="Gitlab"><em class="fab fa-gitlab"></em><span
                               class="menu-title sr-only">Gitlab</span></a></li>
-                        <li class="nav-item"><a class="nav-link" target="_blank" href="https://dev.to/nestordgs/"
-                            title="Dev"><i class="fab fa-dev"></i><span class="menu-title sr-only">Gitlab</span></a>
+                        <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener"  href="https://dev.to/nestordgs/"
+                            title="Dev"><em class="fab fa-dev"></em><span class="menu-title sr-only">Gitlab</span></a>
                         </li>
                       </ul>
                     </nav>
@@ -113,10 +116,6 @@
           <div class="text-center mb-5">
             <h2 class="marker marker-center">My Certifications</h2>
           </div>
-          <!-- <div class="text-center">
-            <p class="mx-auto mb-3" style="max-width:600px"> I offer services fit for any website or app. I can quickly
-              maximize timely deliverables for real-time schemas.</p>
-          </div> -->
           <div class="row py-3">
             <ul class="list-group">
               <li class="list-group-item border-0">
@@ -249,19 +248,19 @@
             <div class="h4">Nestor Gutierrez</div>
             <p>Full Stack Developer</p>
             <div class="social-nav">
-              <nav role="navigation">
+              <nav role="navigation-links-footer" aria-labelledby="mainnavlinksfooter">
                 <ul class="nav justify-content-center">
-                  <li class="nav-item"><a class="nav-link" target="_blank" href="https://www.linkedin.com/nestordgs"
-                      title="LinkedIn"><i class="fab fa-linkedin"></i><span
+                  <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener"  href="https://www.linkedin.com/nestordgs"
+                      title="LinkedIn"><em class="fab fa-linkedin"></em><span
                         class="menu-title sr-only">LinkedIn</span></a></li>
-                  <li class="nav-item"><a class="nav-link" target="_blank" href="https://github.com/nestordgs"
-                      title="GitHub"><i class="fab fa-github"></i><span class="menu-title sr-only">GitHub</span></a>
+                  <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener"  href="https://github.com/nestordgs"
+                      title="GitHub"><em class="fab fa-github"></em><span class="menu-title sr-only">GitHub</span></a>
                   </li>
-                  <li class="nav-item"><a class="nav-link" target="_blank" href="https://gitlab.com/nestordgs"
-                      title="Gitlab"><i class="fab fa-gitlab"></i><span class="menu-title sr-only">Gitlab</span></a>
+                  <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener"  href="https://gitlab.com/nestordgs"
+                      title="Gitlab"><em class="fab fa-gitlab"></em><span class="menu-title sr-only">Gitlab</span></a>
                   </li>
-                  <li class="nav-item"><a class="nav-link" target="_blank" href="https://dev.to/nestordgs/"
-                      title="Dev"><i class="fab fa-dev"></i><span class="menu-title sr-only">Gitlab</span></a></li>
+                  <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener"  href="https://dev.to/nestordgs/"
+                      title="Dev"><em class="fab fa-dev"></em><span class="menu-title sr-only">Gitlab</span></a></li>
                 </ul>
               </nav>
             </div>
@@ -270,15 +269,15 @@
             <div class="mb-1">&copy; nestordgs. All rights reserved. | 2021</div>
             <div>
               <!-- Make sure to buy a license for the template before removing the line below. Buy license on https://templateflip.com/ -->Design
-              - <a href="https://templateflip.com/" target="_blank">TemplateFlip</a>
+              - <a href="https://templateflip.com/" target="_blank" rel="noopener">TemplateFlip</a>
             </div>
           </div>
         </div>
       </footer>
     </div>
   </div>
-  <div id="scrolltop"><a class="btn btn-secondary" href="#top"><span class="icon"><i
-          class="fas fa-angle-up fa-x"></i></span></a></div>
+  <div id="scrolltop"><a class="btn btn-secondary" href="#top"><span class="icon"><em
+          class="fas fa-angle-up fa-x"></em></span></a></div>
   <script src="./scripts/imagesloaded.pkgd.min.js?ver=1.2.0"></script>
   <script src="./scripts/masonry.pkgd.min.js?ver=1.2.0"></script>
   <script src="./scripts/BigPicture.min.js?ver=1.2.0"></script>

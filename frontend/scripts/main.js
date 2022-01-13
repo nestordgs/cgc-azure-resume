@@ -3,7 +3,7 @@ const getCounter = (api, page) => {
 
   fetch(
     url,
-    { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET' } }
+    { headers: { 'Access-Control-Allow-Origin': 'http://localhost:4000', 'Access-Control-Allow-Methods': 'GET' } }
   )
     .then((response) => {
       return response.json()
@@ -74,11 +74,15 @@ const updateCounter = (api, page) => {
   var elem = document.querySelector('.grid');
   if (elem) {
     imagesLoaded(elem, function () {
-      new Masonry(elem, {
-        itemSelector: '.grid-item',
-        percentPosition: true,
-        horizontalOrder: true
-      });
+      try {
+        new Masonry(elem, {
+          itemSelector: '.grid-item',
+          percentPosition: true,
+          horizontalOrder: true
+        });
+      } catch (error) {
+        console.error(error)
+      }
     })
   }
 
