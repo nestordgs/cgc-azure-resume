@@ -40,23 +40,23 @@ jobs:
           parameters: devops/storage-account-parameters.json
           deploymentName: acg-resume-az-stge-account-deployment
         
-      - name: Create Cosmo DB
-        uses: azure/arm-deploy@v1
-        if: success()
-        with:
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: devops/cosmo-db-template.json
-          parameters: devops/cosmo-db-parameters.json
-          deploymentName: acg-resume-az-cosmos-db-deployment
-        
-      - name: Create Azure Function App
-        uses: azure/arm-deploy@v1
-        if: success()
-        with:
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-          template: devops/func-app-template.json
-          parameters: devops/func-app-parameters.json
-          deploymentName: acg-resume-az-function-app-deployment
+      # - name: Create Cosmo DB
+      #   uses: azure/arm-deploy@v1
+      #   if: success()
+      #   with:
+      #     resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+      #     template: devops/cosmo-db-template.json
+      #     parameters: devops/cosmo-db-parameters.json
+      #     deploymentName: acg-resume-az-cosmos-db-deployment
+
+      # - name: Create Azure Function App
+      #   uses: azure/arm-deploy@v1
+      #   if: success()
+      #   with:
+      #     resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+      #     template: devops/func-app-template.json
+      #     parameters: devops/func-app-parameters.json
+      #     deploymentName: acg-resume-az-function-app-deployment
             
   destroy-azure-resources:
     runs-on: ubuntu-latest
