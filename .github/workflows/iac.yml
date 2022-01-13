@@ -57,6 +57,11 @@ jobs:
             -d '$web' \
             -s frontend/
 
+      # - name: Purge CDN endpoint
+      #   if: success()
+      #   run: |
+      #     ls
+      
       # - name: Create Cosmo DB
       #   uses: azure/arm-deploy@v1
       #   if: success()
