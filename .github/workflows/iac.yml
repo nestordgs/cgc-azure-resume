@@ -63,7 +63,8 @@ jobs:
         run: |
           endpointStorageAccount=$(az storage account show \
             -g ${{ env.AZURE_RESOURCE_GROUP }} \
-            -n ${{ steps.deployStorageAccount.outputs.StorageAccountName }})
+            -n ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
+            --query primaryEndpoints.web)
       
       - name: Update Endpoint Origin
         if: success()
