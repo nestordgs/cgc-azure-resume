@@ -65,6 +65,8 @@ jobs:
             -g ${{ env.AZURE_RESOURCE_GROUP }} \
             -n ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
             --query primaryEndpoints.web)
+
+          echo "::set-output name=endpointStorageAccount::$endpointStorageAccount"
       
       - name: Update Endpoint Origin
         if: success()
