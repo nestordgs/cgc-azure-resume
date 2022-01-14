@@ -7,7 +7,6 @@ on:
 env:
   AZURE_RESOURCE_GROUP: cgc-azure-resume
   AZURE_LOCATION: '"Central US"'
-  AZURE_STORAGE_ACCOUNT_NAME: acgresumeazdevstge
 
 jobs:
   setup-up-azure-resources:
@@ -33,6 +32,7 @@ jobs:
         
       - name: Create Storage Account in Resource Group
         uses: azure/arm-deploy@v1
+        id: deployStorageAccount
         if: success()
         with:
           resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
@@ -44,7 +44,7 @@ jobs:
         if: success()
         run: |
           az storage blob service-properties update \
-            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-name ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
             --static-website \
             --404-document index.html \
             --index-document index.html
@@ -53,33 +53,32 @@ jobs:
         if: success()
         run: |
           az storage blob upload-batch \
-            --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-name ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
             -d '$web' \
             -s frontend/
 
-      # - name: Purge CDN endpoint
-      #   if: success()
-      #   run: |
-      #     ls
+      - name: Get Storage Account Endpoint
+        if: success()
+        id: storageAccountEndpoint
+        run: |
+          endpointStorageAccount=$(az storage account show \
+            -g ${{ env.AZURE_RESOURCE_GROUP }} \
+            -n ${{ steps.deployStorageAccount.outputs.StorageAccountName }})
       
-      # - name: Create Cosmo DB
-      #   uses: azure/arm-deploy@v1
-      #   if: success()
-      #   with:
-      #     resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-      #     template: devops/cosmo-db-template.json
-      #     parameters: devops/cosmo-db-parameters.json
-      #     deploymentName: acg-resume-az-cosmos-db-deployment
+      - name: Update Endpoint Origin
+        if: success()
+        run: |
+          az cdn origin update \
+            -g ${{ env.AZURE_RESOURCE_GROUP }} \
+            --profile-name ${{ steps.deployStorageAccount.outputs.ProfileName }}) \
+            --endpoint-name ${{ steps.deployStorageAccount.outputs.EndpointName }}) \
+            -n ${{ steps.deployStorageAccount.outputs.OriginName }}) \
+            --http-port 80 \
+            --https-port 443 \
+            --priority 1 \
+            --weight 500 \
+            --host-name ${{ steps.storageAccountEndpoint.outputs.endpointStorageAccount }}
 
-      # - name: Create Azure Function App
-      #   uses: azure/arm-deploy@v1
-      #   if: success()
-      #   with:
-      #     resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-      #     template: devops/func-app-template.json
-      #     parameters: devops/func-app-parameters.json
-      #     deploymentName: acg-resume-az-function-app-deployment
-            
   destroy-azure-resources:
     runs-on: ubuntu-latest
     

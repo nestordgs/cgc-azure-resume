@@ -362,7 +362,7 @@
                             "httpsPort": 443,
                             "originHostHeader": "[concat(variables('storageAccountsName'),'.z13.web.core.windows.net')]",
                             "priority": 1,
-                            "weight": 1000,
+                            "weight": 500,
                             "enabled": true
                         }
                     }
@@ -374,6 +374,22 @@
         "AzureWebJobsStorage": {
             "type": "string",
             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountsName'), ';AccountKey=', listKeys( resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountsName') ), '2021-04-01' ).keys[0].value, ';EndpointSuffix=core.windows.net' ) ]"
+        },
+        "StorageAccountName": {
+            "type": "string",
+            "value": "[variables('storageAccountsName')]"
+        },
+        "ProfileName": {
+            "type": "string",
+            "value": "[parameters('profileName')]"
+        },
+        "EndpointName": {
+            "type": "string",
+            "value": "[parameters('endpointName')]"
+        },
+        "OriginName": {
+            "type": "string",
+            "value": "resumewebsite"
         }
     }
 }
