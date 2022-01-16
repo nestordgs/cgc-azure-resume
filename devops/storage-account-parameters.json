@@ -2,20 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "value": "eastus"
-        },
         "storageAccountName": {
-            "value": "acgresumeaztesting"
+            "value": "stge"
         },
         "accountType": {
             "value": "Standard_RAGRS"
         },
         "kind": {
             "value": "StorageV2"
-        },
-        "accessTier": {
-            "value": "Hot"
         },
         "minimumTlsVersion": {
             "value": "TLS1_2"
@@ -62,12 +56,6 @@
         "isVersioningEnabled": {
             "value": false
         },
-        "isShareSoftDeleteEnabled": {
-            "value": true
-        },
-        "shareSoftDeleteRetentionDays": {
-            "value": 7
-        },
         "project": {
             "value": "acg-resume-az"
         },
@@ -76,6 +64,12 @@
         },
         "environment": {
             "value": "dev"
+        },
+        "profileName": {
+            "value": "cdn-profile-acg-resume-az"
+        },
+        "endpointName": {
+            "value": "acg-resume-az-nestordgs"
         }
     }
 }

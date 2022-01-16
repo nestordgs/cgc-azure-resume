@@ -269,3 +269,7 @@ footer a:not(.nav-link) {
 .entry-title a {
   text-decoration: none;
 }
+
+.counter-message {
+  font-size: 10px;
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "function_app_name": {
+            "value": "counter"
+        },
+        "service_plan_name": {
+            "value": "svc-plan-counter"
+        },
+        "project": {
+            "value": "acg-resume-az"
+        },
+        "createdBy": {
+            "value": "nestordgs"
+        },
+        "environment": {
+            "value": "dev"
+        }
+    }
+}

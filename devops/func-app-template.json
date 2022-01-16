@@ -1,0 +1,329 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "type": "string",
+            "defaultValue": "dev",
+            "metadata": {
+                "description": "Environment name where will be deployed the template"
+            }
+        },
+        "project": {
+            "type": "string",
+            "metadata": {
+                "description": "Project name"
+            }
+        },
+        "createdBy": {
+            "type": "string",
+            "metadata": {
+                "description": "Person who deploy the template"
+            }
+        },
+        "function_app_name": {
+            "defaultValue": "acg-function-app-name-parameter",
+            "type": "String"
+        },
+        "service_plan_name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of service plan who will be created first in the template"
+            }
+        }
+    },
+    "variables": {
+        "function_app_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name') ) ]",
+        "service_plan_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('service_plan_name') ) ]",
+        "stoge_acc_deployment": "[ concat( parameters('project'), '-stge-account', '-deployment' ) ]",
+        "cosmos_db_deployment": "[ concat( parameters('project'), '-cosmos-db', '-deployment' ) ]",
+        "app_insights_name": "[ concat( parameters('project'), '-', parameters('environment'), '-', parameters('function_app_name'), 'insights' ) ]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('service_plan_name')]",
+            "location": "[ resourceGroup().location ]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "elasticScaleEnabled": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0,
+                "zoneRedundant": false
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('function_app_name')]",
+            "location": "[ resourceGroup().location ]",
+            "kind": "functionapp,linux",
+            "dependsOn": [
+                "[ resourceId('Microsoft.Web/serverfarms', variables('service_plan_name') ) ]" // TODO: Add dependenci of storage account
+            ],
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(variables('function_app_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(variables('function_app_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('service_plan_name'))]",
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {
+                    "numberOfWorkers": 1,
+                    "linuxFxVersion": "Python|3.9",
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 200,
+                    "minimumElasticInstanceCount": 0,
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('stoge_acc_deployment')), '2021-04-01' ).outputs.azureWebJobsStorage.value ]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('stoge_acc_deployment')), '2021-04-01' ).outputs.azureWebJobsStorage.value ]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('app_insights_name')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[ toLower( variables('function_app_name') ) ]"
+                        },
+                        {
+                            "name": "CONNECTION_HOST",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.urlConnection.value ]"
+                        },
+                        {
+                            "name": "KEY_DB",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.primaryMasterKey.value ]"
+                        },
+                        {
+                            "name": "DATABASE_NAME",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.databaseName.value ]"
+                        },
+                        {
+                            "name": "CONTAINER_NAME",
+                            "value": "[ reference( resourceId('Microsoft.Resources/deployments', variables('cosmos_db_deployment')), '2021-04-01' ).outputs.containerName.value ]"
+                        }
+                    ]
+                },
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "clientCertMode": "Required",
+                "hostNamesDisabled": false,
+                "customDomainVerificationId": "71E0697E215335964F9E08587D945527C939AB4C4126DD0C3FE0CBCD7C8A6882",
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None",
+                "storageAccountRequired": false,
+                "keyVaultReferenceIdentity": "SystemAssigned"
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('function_app_name'), '/ftp')]",
+            "location": "[ resourceGroup().location ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('function_app_name'))]"
+            ],
+            "kind": "",
+            "properties": {
+                "allow": true
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },        
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('function_app_name'), '/scm')]",
+            "location": "[ resourceGroup().location ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('function_app_name'))]"
+            ],
+            "properties": {
+                "allow": true
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('function_app_name'), '/web')]",
+            "location": "[ resourceGroup().location ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('function_app_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "Python|3.9",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "httpLoggingEnabled": false,
+                "acrUseManagedIdentityCreds": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "[ concat( '$', variables('function_app_name') ) ]",
+                "scmType": "None",
+                "use32BitWorkerProcess": false,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetRouteAllEnabled": false,
+                "vnetPrivatePortsCount": 0,
+                "localMySqlEnabled": false,
+                "cors": {
+                    "allowedOrigins": [
+                        "*"
+                    ]
+                },
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "scmMinTlsVersion": "1.0",
+                "ftpsState": "AllAllowed",
+                "preWarmedInstanceCount": 0,
+                "functionAppScaleLimit": 200,
+                "functionsRuntimeScaleMonitoringEnabled": false,
+                "minimumElasticInstanceCount": 0,
+                "azureStorageAccounts": {}
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(variables('function_app_name'), '/', variables('function_app_name'), '.azurewebsites.net')]",
+            "location": "[ resourceGroup().location ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('function_app_name'))]"
+            ],
+            "properties": {
+                "siteName": "[ variables('function_app_name') ]",
+                "hostNameType": "Verified"
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]",
+                "Created By": "[parameters('createdBy')]",
+                "Project": "[parameters('project')]"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02",
+            "name": "[variables('app_insights_name')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "web",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('function_app_name'))]": "Resource"
+            },
+            "properties": {
+                "Application_Type": "web",
+                "ApplicationId": "[variables('app_insights_name')]"
+            }
+        }
+    ],
+    "outputs": {}
+}

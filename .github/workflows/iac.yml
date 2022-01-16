@@ -1,0 +1,107 @@
+name: IAC Deployment.
+on:
+  pull_request:
+    types: [labeled]
+    branches: [main]
+
+env:
+  AZURE_LOCATION: '"Central US"'
+
+jobs:
+  setup-up-azure-resources:
+    runs-on: ubuntu-latest
+    
+    if: contains(github.event.pull_request.labels.*.name, 'Create Infra')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - name: Create Azure Resource Group
+        if: success()
+        run: |
+          az group create --location ${{ env.AZURE_LOCATION }} \
+            --name ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: Create Storage Account in Resource Group
+        uses: azure/arm-deploy@v1
+        id: deployStorageAccount
+        if: success()
+        with:
+          resourceGroupName: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          template: devops/storage-account-template.json
+          parameters: devops/storage-account-parameters.json
+          deploymentName: acg-resume-az-stge-account-deployment
+      
+      - name: Enabled Static Website for Storage Account
+        if: success()
+        run: |
+          az storage blob service-properties update \
+            --account-name ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
+            --static-website \
+            --404-document index.html \
+            --index-document index.html
+
+      - name: Upload Frontend files to Storage account
+        if: success()
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
+            -d '$web' \
+            -s frontend/
+
+      - name: Get Storage Account Endpoint
+        if: success()
+        id: storageAccountEndpoint
+        run: |
+          endpointStorageAccount=$(az storage account show \
+            -g ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            -n ${{ steps.deployStorageAccount.outputs.StorageAccountName }} \
+            --query primaryEndpoints.web \
+            | tr -d '"' \
+            | sed s/"https:\/\/"// \
+            | tr -d '/')
+
+          echo "::set-output name=endpointStorageAccount::$endpointStorageAccount"
+      
+      - name: Update Endpoint Origin
+        if: success()
+        run: |
+          az cdn origin update \
+            -g ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --profile-name ${{ steps.deployStorageAccount.outputs.ProfileName }} \
+            --endpoint-name ${{ steps.deployStorageAccount.outputs.EndpointName }} \
+            -n ${{ steps.deployStorageAccount.outputs.OriginName }} \
+            --http-port 80 \
+            --https-port 443 \
+            --priority 1 \
+            --weight 500 \
+            --host-name ${{ steps.storageAccountEndpoint.outputs.endpointStorageAccount }}
+
+  destroy-azure-resources:
+    runs-on: ubuntu-latest
+    
+    if: contains(github.event.pull_request.labels.*.name, 'Destroy Infra')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Destroy Azure Environment
+        if: success()
+        run: |
+          az group delete --name ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} \
+            --yes
+    
