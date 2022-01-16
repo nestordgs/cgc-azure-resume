@@ -1,13 +1,14 @@
 name: Frontend Deployment
 on:
-  push:
-    branches: [ develop ]
+  pull_request:
+    types: [ closed ]
     paths:
       - "frontend/**"
 
 jobs:
   update-front-end:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
