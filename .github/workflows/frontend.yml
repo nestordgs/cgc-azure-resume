@@ -22,7 +22,7 @@ jobs:
         if: success()
         run: |
           az storage blob upload-batch \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
             -d '$web' \
             -s frontend/
 
