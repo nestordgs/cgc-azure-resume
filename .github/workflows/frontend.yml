@@ -1,0 +1,36 @@
+name: Frontend Deployment
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - "frontend/**"
+
+jobs:
+  update-front-end:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Upload edited files to Storage account "frontend"
+        if: success()
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+            -d '$web' \
+            -s frontend/
+
+      - name: Purge CDN Endpoint
+        if: success()
+        run: |
+          az cdn endpoint purge \
+            -n ${{ secrets.AZURE_CDN_ENDPOINT }} \
+            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
+            --content-paths "/*" \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --no-wait
